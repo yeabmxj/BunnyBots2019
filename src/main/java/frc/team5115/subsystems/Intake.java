@@ -26,6 +26,7 @@ public class Intake {
         if (intaking) {
             actuate(INTAKE_SPEED, FEEDER_SPEED);
         }
+
         else {
             actuate(0, FEEDER_SPEED);
         }

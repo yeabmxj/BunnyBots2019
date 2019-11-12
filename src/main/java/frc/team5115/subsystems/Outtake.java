@@ -4,7 +4,8 @@ import edu.wpi.first.wpilibj.Spark;
 
 import static frc.team5115.base.Constants.*;
 
-public class Outtake {
+public class
+Outtake {
     private Spark shooter;
 
     public Outtake() {
