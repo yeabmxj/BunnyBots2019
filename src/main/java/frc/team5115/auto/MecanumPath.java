@@ -3,7 +3,7 @@ package frc.team5115.auto;
 import frc.team5115.calculations.PID;
 
 import static frc.team5115.robot.Robot.drivesystem;
-import static frc.team5115.robot.Robot.gyro;
+
 
 public class MecanumPath {
     private PID translate;
@@ -25,6 +25,6 @@ public class MecanumPath {
         rotateY = translate.PID(rotateY, 0, 1);
         strafeZ = translate.PID(strafeZ, 0, 1);
 
-        drivesystem.drive(rotateY, translateX, strafeZ, gyro.getYaw(), speedCap,0);
+        drivesystem.drive(rotateY, translateX, strafeZ, 0, speedCap,0);
     }
 }

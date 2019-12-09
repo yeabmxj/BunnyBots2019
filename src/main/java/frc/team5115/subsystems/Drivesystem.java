@@ -4,24 +4,27 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.drive.RobotDriveBase;
+import edu.wpi.first.wpilibj.drive.Vector2d;
 import frc.team5115.wrappers.TalonWrapper;
 
 import static frc.team5115.base.Constants.*;
 import static frc.team5115.robot.Robot.*;
 
 public class Drivesystem {
-    private TalonWrapper frontLeft;
-    private TalonWrapper frontRight;
-    private TalonWrapper backLeft;
-    private TalonWrapper backRight;
+    private TalonSRX frontLeft;
+    private TalonSRX frontRight;
+    private TalonSRX backLeft;
+    private TalonSRX backRight;
+
 
     private double throttle = INITIAL_THROTTLE;
 
     public Drivesystem() {
-        frontLeft = new TalonWrapper(FRONT_LEFT_ID);
-        frontRight = new TalonWrapper(FRONT_RIGHT_ID);
-        backLeft = new TalonWrapper(BACK_LEFT_ID);
-        backRight = new TalonWrapper(BACK_RIGHT_ID);
+        frontLeft = new TalonSRX(FRONT_LEFT_ID);
+        frontRight = new TalonSRX(FRONT_RIGHT_ID);
+        backLeft = new TalonSRX(BACK_LEFT_ID);
+        backRight = new TalonSRX(BACK_RIGHT_ID);
 
         frontLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         frontRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
@@ -33,20 +36,23 @@ public class Drivesystem {
         y = deadband(y);
         x = deadband(x);
 
-        double[] processed = rotate(x,y,gyroangle);
+        //double[] processed = rotate(x,y,gyroangle);
 
-        double[] wheelSpeeds = new double[5];
-        wheelSpeeds[1] = processed[0] + processed[1] + z;
-        wheelSpeeds[2] = processed[0] - processed[1] + z;
-        wheelSpeeds[3] = processed[0] + processed[1] + z;
-        wheelSpeeds[4] = processed[0] + processed[1] - z;
+        Vector2d input = new Vector2d(y,x);
+        input.rotate(-gyroangle);
+
+        double[] wheelSpeeds = new double[7];
+        wheelSpeeds[FRONT_LEFT_ID] = input.x + input.y + z;
+        wheelSpeeds[FRONT_RIGHT_ID] = -input.x + input.y - z;
+        wheelSpeeds[BACK_LEFT_ID] = -input.x + input.y + z;
+        wheelSpeeds[BACK_RIGHT_ID] = input.x + input.y - z;
 
         normalize(wheelSpeeds);
 
-        frontLeft.set(wheelSpeeds[1] * throttle * speedCap);
-        frontRight.set(wheelSpeeds[2] * throttle * speedCap);
-        backLeft.set(wheelSpeeds[3] * throttle * speedCap);
-        backRight.set(wheelSpeeds[4] * throttle * speedCap);
+        frontLeft.set(ControlMode.PercentOutput, wheelSpeeds[FRONT_LEFT_ID] * throttle * speedCap);
+        frontRight.set(ControlMode.PercentOutput, wheelSpeeds[FRONT_RIGHT_ID] * throttle * speedCap * -1);
+        backLeft.set(ControlMode.PercentOutput, wheelSpeeds[BACK_LEFT_ID] * throttle * speedCap);
+        backRight.set(ControlMode.PercentOutput, wheelSpeeds[BACK_RIGHT_ID] * throttle * speedCap * -1);
     }
 
     public double throttle(double increase, double decrease) {
@@ -89,7 +95,7 @@ public class Drivesystem {
                 maxMagnitude = temp;
             }
         }
-        if (maxMagnitude > 1) {
+        if (maxMagnitude > 1.0) {
             for (int i = 0; i < wheelSpeeds.length; i++) {
                 wheelSpeeds[i] = wheelSpeeds[i] / maxMagnitude;
             }
@@ -99,8 +105,7 @@ public class Drivesystem {
     public void init() {
         update();
     }
-
     public void update() {
-        drivesystem.drive(joy.getY(), joy.getX(), joy.getZ(), gyro.getYaw(), SPEED_CAP, drivesystem.throttle(joy.increaseThrottle(), joy.decreaseThrottle()));
+        drivesystem.drive(joy.getY(), -joy.getX(), joy.getZ(), 0, 1, SPEED_CAP);
     }
 }

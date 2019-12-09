@@ -14,6 +14,7 @@ public class Controls {
     public double getX() { return joy.getRawAxis(X_AXIS); }
     public double getY() { return joy.getRawAxis(Y_AXIS); }
     public double getZ() { return joy.getRawAxis(Z_AXIS); }
+
     public double increaseThrottle() { return joy.getRawAxis(INCREASE_THROTTLE); }
     public double decreaseThrottle() { return joy.getRawAxis(DECREASE_THROTTLE); }
 
