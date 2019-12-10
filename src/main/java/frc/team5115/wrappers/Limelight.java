@@ -10,12 +10,17 @@ public class Limelight   {
     private NetworkTableEntry ta;
     private NetworkTableEntry tv;
 
+    public NetworkTableEntry LED;
+    public NetworkTableEntry CAM;
+
     public Limelight() {
         NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
         tx = table.getEntry("tx");
         ty = table.getEntry("ty");
         ta = table.getEntry("ta");
         tv = table.getEntry("tv");
+        LED = table.getEntry("ledMode");
+        CAM = table.getEntry("camMode");
     }
     public double getContourInfo(String s) {
         return NetworkTableInstance.getDefault().getTable("limelight").getEntry(s).getDouble(0);
@@ -27,6 +32,11 @@ public class Limelight   {
 
     public double getEntry(String variableName) {
         return NetworkTableInstance.getDefault().getTable("limelight").getEntry(variableName).getDouble(0);
+    }
+
+    public void cameraMode() {
+        LED.setNumber(1);
+        CAM.setNumber(1);
     }
 
 }

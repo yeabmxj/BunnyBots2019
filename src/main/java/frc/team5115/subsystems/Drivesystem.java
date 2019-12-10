@@ -41,7 +41,7 @@ public class Drivesystem {
         Vector2d input = new Vector2d(y,x);
         input.rotate(-gyroangle);
 
-        double[] wheelSpeeds = new double[7];
+        double[] wheelSpeeds = new double[4];
         wheelSpeeds[FRONT_LEFT_ID] = input.x + input.y + z;
         wheelSpeeds[FRONT_RIGHT_ID] = -input.x + input.y - z;
         wheelSpeeds[BACK_LEFT_ID] = -input.x + input.y + z;
