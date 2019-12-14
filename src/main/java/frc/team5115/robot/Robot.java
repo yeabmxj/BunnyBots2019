@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
     }
 
     public void autonomousPeriodic() {
-        if (start + duration <= Timer.getFPGATimestamp()) {
+        if (start + duration >= Timer.getFPGATimestamp()) {
             drivesystem.drive(.5,0,0,0);
         }
     }
