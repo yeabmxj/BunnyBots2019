@@ -45,7 +45,26 @@ public class Drivesystem {
     }
 
     public void drive(double y, double x, double z, double gyroangle) {
-       driveMath.driveCartesian(y,x,z,gyroangle);
+        y = deadband(y);
+        x = deadband(x);
+
+        //double[] processed = rotate(x,y,gyroangle);
+
+        Vector2d input = new Vector2d(y,x);
+        input.rotate(-gyroangle);
+
+        double[] wheelSpeeds = new double[7];
+        wheelSpeeds[FRONT_LEFT_ID] = input.x + input.y + z;
+        wheelSpeeds[FRONT_RIGHT_ID] = -input.x + input.y - z;
+        wheelSpeeds[BACK_LEFT_ID] = -input.x + input.y + z;
+        wheelSpeeds[BACK_RIGHT_ID] = input.x + input.y - z;
+
+        normalize(wheelSpeeds);
+
+        frontLeft.set(ControlMode.PercentOutput, wheelSpeeds[FRONT_LEFT_ID]);
+        frontRight.set(ControlMode.PercentOutput, wheelSpeeds[FRONT_RIGHT_ID] * -1);
+        backLeft.set(ControlMode.PercentOutput, wheelSpeeds[BACK_LEFT_ID]);
+        backRight.set(ControlMode.PercentOutput, wheelSpeeds[BACK_RIGHT_ID] * -1);
     }
 
     public double throttle(double increase, double decrease) {
