@@ -3,6 +3,10 @@ package frc.team5115.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.drive.RobotDriveBase;
 import edu.wpi.first.wpilibj.drive.Vector2d;
@@ -12,47 +16,36 @@ import static frc.team5115.base.Constants.*;
 import static frc.team5115.robot.Robot.*;
 
 public class Drivesystem {
-    private TalonSRX frontLeft;
-    private TalonSRX frontRight;
-    private TalonSRX backLeft;
-    private TalonSRX backRight;
+    private WPI_TalonSRX frontLeft;
+    private WPI_TalonSRX frontRight;
+    private WPI_TalonSRX backLeft;
+    private WPI_TalonSRX backRight;
 
+    public AHRS gyro;
+
+    MecanumDrive driveMath;
 
     private double throttle = INITIAL_THROTTLE;
 
     public Drivesystem() {
-        frontLeft = new TalonSRX(FRONT_LEFT_ID);
-        frontRight = new TalonSRX(FRONT_RIGHT_ID);
-        backLeft = new TalonSRX(BACK_LEFT_ID);
-        backRight = new TalonSRX(BACK_RIGHT_ID);
+        frontLeft = new WPI_TalonSRX(FRONT_LEFT_ID);
+        frontRight = new WPI_TalonSRX(FRONT_RIGHT_ID);
+        backLeft = new WPI_TalonSRX(BACK_LEFT_ID);
+        backRight = new WPI_TalonSRX(BACK_RIGHT_ID);
+
+        gyro = new AHRS(SPI.Port.kMXP);
+        gyro.reset();
 
         frontLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         frontRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         backLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
         backRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+
+        driveMath = new MecanumDrive(frontLeft, backLeft, frontRight, backRight);
     }
 
-    public void drive(double y, double x, double z, double gyroangle, double throttle, double speedCap) {
-        y = deadband(y);
-        x = deadband(x);
-
-        //double[] processed = rotate(x,y,gyroangle);
-
-        Vector2d input = new Vector2d(y,x);
-        input.rotate(-gyroangle);
-
-        double[] wheelSpeeds = new double[4];
-        wheelSpeeds[FRONT_LEFT_ID] = input.x + input.y + z;
-        wheelSpeeds[FRONT_RIGHT_ID] = -input.x + input.y - z;
-        wheelSpeeds[BACK_LEFT_ID] = -input.x + input.y + z;
-        wheelSpeeds[BACK_RIGHT_ID] = input.x + input.y - z;
-
-        normalize(wheelSpeeds);
-
-        frontLeft.set(ControlMode.PercentOutput, wheelSpeeds[FRONT_LEFT_ID] * throttle * speedCap);
-        frontRight.set(ControlMode.PercentOutput, wheelSpeeds[FRONT_RIGHT_ID] * throttle * speedCap * -1);
-        backLeft.set(ControlMode.PercentOutput, wheelSpeeds[BACK_LEFT_ID] * throttle * speedCap);
-        backRight.set(ControlMode.PercentOutput, wheelSpeeds[BACK_RIGHT_ID] * throttle * speedCap * -1);
+    public void drive(double y, double x, double z, double gyroangle) {
+       driveMath.driveCartesian(y,x,z,gyroangle);
     }
 
     public double throttle(double increase, double decrease) {
@@ -87,6 +80,13 @@ public class Drivesystem {
         }
     }
 
+    public void debug() {
+//        System.out.println(frontLeft.getSelectedSensorPosition());
+//        System.out.println(frontRight.getSelectedSensorPosition());
+//        System.out.println(backLeft.getSelectedSensorPosition());
+//        System.out.println(backRight.getSelectedSensorPosition());
+    }
+
     private void normalize(double[] wheelSpeeds) {
         double maxMagnitude = Math.abs(wheelSpeeds[0]);
         for (int i = 1; i < wheelSpeeds.length; i++) {
@@ -106,6 +106,6 @@ public class Drivesystem {
         update();
     }
     public void update() {
-        drivesystem.drive(joy.getY(), -joy.getX(), joy.getZ(), 0, 1, SPEED_CAP);
+        drivesystem.drive(joy.getX(), -joy.getY(), joy.getZ(), 0);
     }
 }

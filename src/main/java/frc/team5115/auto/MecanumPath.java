@@ -25,6 +25,6 @@ public class MecanumPath {
         rotateY = translate.PID(rotateY, 0, 1);
         strafeZ = translate.PID(strafeZ, 0, 1);
 
-        drivesystem.drive(rotateY, translateX, strafeZ, 0, speedCap,0);
+        //drivesystem.drive(rotateY, translateX, strafeZ, 0, speedCap,0);
     }
 }

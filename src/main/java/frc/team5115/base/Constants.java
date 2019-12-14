@@ -5,11 +5,11 @@ public class Constants {
     public static final int SAMPLE_SIZE = 10;
 
     //Ball Manipulator
-    public static final double GRAVITY_METERS = 9.8;
-    public static final double DISTANCE_TEMPORARY_METERS = 0;
-    public static final double MAGIC_CONSTANT = 0;
-    public static final double BALL_ANGLE_RADIANS = 0;
-    public static final double Y_TARGET_METERS = 0;
+    public static final double GRAVITY_METERS = 9.806;
+    public static final double DISTANCE_TEMPORARY_METERS = 2;
+    public static final double BALL_ANGLE_RADIANS = 45 * (Math.PI / 180);
+    public static final double MAGIC_CONSTANT = Math.pow(2 * Math.cos(BALL_ANGLE_RADIANS), 2);
+    public static final double Y_TARGET_METERS = .7671;
 
     //Intake
     public static final int INTAKE_ID = 9;
@@ -38,8 +38,8 @@ public class Constants {
     public static final double INITIAL_THROTTLE = .5;
 
     //Joystick
-    public static final int X_AXIS = 1;
-    public static final int Y_AXIS = 0;
+    public static final int X_AXIS = 0;
+    public static final int Y_AXIS = 1;
     public static final int Z_AXIS = 4;
     public static final int INCREASE_THROTTLE = 5;
     public static final int DECREASE_THROTTLE = 6;

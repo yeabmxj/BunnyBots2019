@@ -32,23 +32,66 @@ public class Manipulator {
         timer = new Heartbeat();
     }
 
+    public void startTimer(){
+        timer.start();
+    }
 
+    public void intake(){
+        intake.set(ControlMode.PercentOutput, -1);
+    }
+
+    public void zeroIntake(){
+        intake.set(ControlMode.PercentOutput, .4);
+    }
+
+    public void shoot(){
+
+        /*
+        double start = Timer.getFPGATimestamp();
+
+         */
+
+        raise();
+        shooter.set(ControlMode.Velocity, metersToTicks(computeInitialVelocity()));
+        shooter.set(ControlMode.PercentOutput, 1);
+        System.out.println(shooter.getSelectedSensorVelocity());
+    }
+
+    public void raise(){
+        elevator.set(ControlMode.PercentOutput, -1);
+    }
+
+    public void lower(){
+        elevator.set(ControlMode.PercentOutput, 0);
+    }
+
+    public void zeroShooter(){
+        elevator.set(ControlMode.PercentOutput, 0);
+        shooter.set(ControlMode.PercentOutput, 0);
+    }
+
+    public double computeInitialVelocity(){
+        double numerator = GRAVITY_METERS * Math.pow(DISTANCE_TEMPORARY_METERS, 2);
+        double denominator = (MAGIC_CONSTANT * (Math.pow(DISTANCE_TEMPORARY_METERS, 2) * Math.tan(BALL_ANGLE_RADIANS) - Y_TARGET_METERS));
+        return Math.sqrt(numerator / denominator);
+    }
+
+    public double metersToTicks(double meters) {
+        return 0;
+    }
+
+    public void init() {
+        startTimer();
+    }
 
     public void update() {
-        if (joy.intake()) {
-            intake.set(ControlMode.PercentOutput, -.85);
-        }
-        else {
-            intake.set(ControlMode.PercentOutput, .85);
-        }
+        if (joy.intake()) { intake(); }
+        else { zeroIntake(); }
 
-        if (joy.outtake()) {
-            shooter.set(ControlMode.PercentOutput, 1);
-            elevator.set(ControlMode.PercentOutput, -1);
-        }
+        if (joy.outtake()) { shoot(); }
         else {
-            shooter.set(ControlMode.PercentOutput, 0);
-            elevator.set(ControlMode.PercentOutput, .5);
+            zeroShooter();
+            lower();
         }
     }
-}
+} 
